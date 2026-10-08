@@ -8,7 +8,7 @@ create table if not exists businesses (
   area text not null default '',
   services text not null default '',
   google_review_url text not null default '',
-  language text not null default 'hinglish',
+  language text not null default 'english',
   accent text not null default '#0f766e',
   min_answers int not null default 0,
   questions jsonb not null default '[]',

@@ -16,7 +16,7 @@ export default async function ReviewPage({ params }) {
 
   const { data: link } = await db()
     .from('short_links')
-    .select('slug,business_id,is_active,language,businesses(name,accent,questions,min_answers,google_review_url,language)')
+    .select('slug,business_id,is_active,language,businesses(name,accent,questions,min_answers,google_review_url,language,ai_paused)')
     .eq('slug', slug)
     .maybeSingle();
 
@@ -31,16 +31,15 @@ export default async function ReviewPage({ params }) {
     );
   }
 
-  // scan count + pause check ek saath (dono se customer ko extra wait nahi)
-  const [pRes, sRes] = await Promise.all([
-    db().from('businesses').select('ai_paused').eq('id', link.business_id).maybeSingle(),
+  const [sRes] = await Promise.all([
     db().from('app_settings').select('ai_paused_all').eq('id', 1).maybeSingle(),
     db().rpc('increment_scans', { p_slug: slug }),
   ]);
 
-  const paused = !!(pRes?.data?.ai_paused || sRes?.data?.ai_paused_all);
+  const paused = !!(b.ai_paused || sRes?.data?.ai_paused_all);
+  console.log('pause check', slug, 'business:', b.ai_paused, 'all:', sRes?.data?.ai_paused_all);
   if (paused && b.google_review_url) {
-    redirect(b.google_review_url); // temporary redirect (307), seedha Google
+    redirect(b.google_review_url);
   }
 
   return (

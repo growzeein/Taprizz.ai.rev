@@ -45,7 +45,7 @@ export default function Editor({ initial, initialLinks }) {
     const res = await fetch('/api/admin/businesses/' + b.id, {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(b),
+     body: JSON.stringify((({ ai_paused, ...rest }) => rest)(b)),
     });
     const data = await res.json();
     setSaving(false);
